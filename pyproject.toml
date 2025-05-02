@@ -1,0 +1,24 @@
+#[build-system]
+#requires = ["setuptools >= 77.0.3"]
+#build-backend = "setuptools.build_meta"
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "example_package"
+version = "0.0.1"
+authors = [
+  { name="Team 20 - REMLA"},
+]
+description = "A small example package"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/remla2025-team20-test/lib-ml"
+#Issues = "https://github.com/pypa/sampleproject/issues"
