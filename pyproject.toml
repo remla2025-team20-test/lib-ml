@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "example_package"
-version = "0.0.5"
+version = "0.0.4"
 authors = [
   { name="Team 20 - REMLA"},
 ]
@@ -24,7 +24,7 @@ Homepage = "https://github.com/remla2025-team20-test/lib-ml"
 #Issues = "https://github.com/pypa/sampleproject/issues"
 
 [tool.bumpversion]
-current_version = "0.0.5"
+current_version = "0.0.4"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
