@@ -9,6 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 #      - uses: actions/checkout@v4
+      - name: Get tag message
+        id: tagmsg
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          MESSAGE=$(git for-each-ref refs/tags/$TAG --format='%(contents)')
+          echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Cancel if tag message is not a version bump
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
+        run: |
+          echo "Tag message does not start with 'Bump version'. Skipping workflow."
+          exit 1
 
       - name: Parse version info from tag
         run: |
@@ -24,6 +36,10 @@ jobs:
 
 #    TODO: checkout branch on which the tag was created (not linked to tag, need to search (branch -r ...))
 
+      - name: Delete tag version
+        run: |
+          git push origin --delete v${{ env.version }}
+
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
@@ -35,6 +51,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_COMMIT: "true"
+          BUMPVERSION_tag: "true"
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
@@ -55,10 +72,11 @@ jobs:
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
-      - uses: actions-ecosystem/action-push-tag@v1
-        with:
-          tag: v${{ env.version }}
-          message: 'UPDATED_PACKAGE_VERSION'
+
+#      - uses: actions-ecosystem/action-push-tag@v1
+#        with:
+#          tag: v${{ env.version }}
+#          message: 'UPDATED_PACKAGE_VERSION'
 
 
 #      - name: Registry Login (ghcr.io)
