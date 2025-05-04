@@ -59,8 +59,8 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_COMMIT: "true"
-          BUMPVERSION_TAG: "true"
-          BUMPVERSION_TAG_NAME: "v${{ env.version }}-release"
+#          BUMPVERSION_TAG: "true"
+#          BUMPVERSION_TAG_NAME: "v${{ env.version }}-release"
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: Force re-push version tag with new commit
         run: |
-          git tag -f v${{ env.version }}
+          git tag -f v${{ env.version }} -m 'Bump version'
           git push origin -f v${{ env.version }}
 
       - name: Check if same versions before and after
