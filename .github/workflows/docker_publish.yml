@@ -71,6 +71,11 @@ jobs:
 #        run: |
 #          echo "Same prev and current version."
 
+      - name: Force re-push version tag with new commit
+        run: |
+          git tag -f v${{ env.version }}
+          git push origin -f v${{ env.version }}
+
       - name: Check if same versions before and after
         if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
         run: |
