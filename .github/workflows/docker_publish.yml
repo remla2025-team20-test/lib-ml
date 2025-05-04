@@ -15,10 +15,10 @@ jobs:
           ref: main
           fetch-depth: 0  # Required to fetch full history and tags
 
-      - name: Configure Git user
-        run: |
-          git config user.name "Adrian Josan"
-          git config user.email "a.josan@tudelft.nl"
+#      - name: Configure Git user
+#        run: |
+#          git config user.name "Adrian Josan"
+#          git config user.email "a.josan@tudelft.nl"
 
       - name: Get tag message
         id: tagmsg
@@ -47,9 +47,9 @@ jobs:
 
 #    TODO: checkout branch on which the tag was created (not linked to tag, need to search (branch -r ...))
 
-      - name: Delete tag version
-        run: |
-          git push origin --delete v${{ env.version }}
+#      - name: Delete tag version
+#        run: |
+#          git push origin --delete v${{ env.version }}
 
       - name: Bump lib-ml package version
         id: bump
@@ -77,6 +77,16 @@ jobs:
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
+      - name: Force overwrite tag
+        run: |
+          git tag -f v${{ env.version }} -m "Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}"
+
+      - name: Push changes to GitHub
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ inputs.github-token }}
+          branch: main
+          force: true
 
 #      - uses: actions-ecosystem/action-push-tag@v1
 #        with:
