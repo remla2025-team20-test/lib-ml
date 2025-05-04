@@ -67,7 +67,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_COMMIT: "true"
-#          BUMPVERSION_TAG: "true"
+          BUMPVERSION_TAG: "true"
 #          BUMPVERSION_TAG_NAME: "v${{ env.version }}-release"
         with:
           args: --new-version ${{ env.version }} -v
