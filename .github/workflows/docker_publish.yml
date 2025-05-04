@@ -79,24 +79,3 @@ jobs:
         if: steps.bump.outputs.bumped == 'true'
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
-
-
-#      - uses: actions-ecosystem/action-push-tag@v1
-#        with:
-#          tag: v${{ env.version }}
-#          message: 'UPDATED_PACKAGE_VERSION'
-
-
-#      - name: Registry Login (ghcr.io)
-#        run: echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-#
-#      - name: Build, tag, and publish image
-#        run: |
-#          IMG=ghcr.io/${{ github.repository }}
-#          docker build \
-#            -t ${IMG}:latest \
-#            -t ${IMG}:${{ env.version_major }}-latest \
-#            -t ${IMG}:${{ env.version_major }}.${{ env.version_minor }}-latest \
-#            -t ${IMG}:${{ env.version }} \
-#            .
-#          docker push --all-tags $IMG
