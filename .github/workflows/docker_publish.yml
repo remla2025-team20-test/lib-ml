@@ -51,7 +51,7 @@ jobs:
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
-          branch: main
+#          branch: main
 
 
       - name: Check if same versions before and after
