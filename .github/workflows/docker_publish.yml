@@ -34,7 +34,7 @@ jobs:
         if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           echo "Tag message starts with 'Bump version'. Skipping workflow."
-          exit 1
+          exit 0
 
       - name: Parse version info from tag
         run: |
@@ -67,7 +67,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_COMMIT: "true"
-          BUMPVERSION_TAG: "true"
+#          BUMPVERSION_TAG: "true"
 #          BUMPVERSION_TAG_NAME: "v${{ env.version }}-release"
         with:
           args: --new-version ${{ env.version }} -v
