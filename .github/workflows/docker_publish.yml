@@ -73,10 +73,15 @@ jobs:
 
       - name: Force re-push version tag with new commit
         run: |
-          git config user.name "Adrian Josan"
-          git config user.email "a.josan@tudelft.nl"
           git tag -f v${{ env.version }} -m 'Bump version'
-          git push origin -f v${{ env.version }}
+#          git push origin -f v${{ env.version }}
+
+      - name: Push updated tag
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          tags: true
+          force: true
 
       - name: Check if same versions before and after
         if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
