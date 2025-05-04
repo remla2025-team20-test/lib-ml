@@ -36,7 +36,7 @@ jobs:
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
-#          branch: main
+          branch: main
 
 #      - name: Check if current version matches tag version
 #        if: steps.bump.outputs.current-version == ${{ env.version }}
