@@ -19,13 +19,13 @@ jobs:
         id: tagmsg
         run: |
           TAG=${GITHUB_REF#refs/tags/}
-          MESSAGE=$(git for-each-ref refs/tags/$TAG --format='%(contents)')
+          MESSAGE=$(git for-each-ref --format='%(contents)' ${GITHUB_REF})
           echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
 
       - name: Cancel if tag message is not a version bump
-        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
+        if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
-          echo "Tag message does not start with 'Bump version'. Skipping workflow."
+          echo "Tag message starts with 'Bump version'. Skipping workflow."
           exit 1
 
       - name: Parse version info from tag
