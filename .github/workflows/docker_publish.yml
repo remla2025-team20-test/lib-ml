@@ -8,6 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0  # Required to fetch full history and tags
+
 #      - uses: actions/checkout@v4
       - name: Get tag message
         id: tagmsg
@@ -39,12 +45,6 @@ jobs:
       - name: Delete tag version
         run: |
           git push origin --delete v${{ env.version }}
-
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0  # Required to fetch full history and tags
 
       - name: Bump lib-ml package version
         id: bump
