@@ -22,6 +22,12 @@ jobs:
           echo "version_minor=$MINOR" >> $GITHUB_ENV
           echo "version_patch=$PATCH" >> $GITHUB_ENV
 
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0  # Required to fetch full history and tags
+
       - name: Bump lib-ml package version
         id: bump
         uses: callowayproject/bump-my-version@master
@@ -30,7 +36,7 @@ jobs:
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
-          branch: main
+#          branch: main
 
 #      - name: Check if current version matches tag version
 #        if: steps.bump.outputs.current-version == ${{ env.version }}
