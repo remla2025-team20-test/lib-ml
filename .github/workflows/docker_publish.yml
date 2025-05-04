@@ -73,6 +73,8 @@ jobs:
 
       - name: Force re-push version tag with new commit
         run: |
+          git config user.name "Adrian Josan"
+          git config user.email "a.josan@tudelft.nl"
           git tag -f v${{ env.version }} -m 'Bump version'
           git push origin -f v${{ env.version }}
 
