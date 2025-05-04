@@ -8,17 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout tag ref branch
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ref: main
-          fetch-depth: 0  # Required to fetch full history and tags
-
-#      - name: Configure Git user
-#        run: |
-#          git config user.name "Adrian Josan"
-#          git config user.email "a.josan@tudelft.nl"
+#          ref: main
+#          fetch-depth: 0  # Required to fetch full history and tags
 
       - name: Get tag message
         id: tagmsg
@@ -47,10 +42,6 @@ jobs:
 
 #    TODO: checkout branch on which the tag was created (not linked to tag, need to search (branch -r ...))
 
-#      - name: Delete tag version
-#        run: |
-#          git push origin --delete v${{ env.version }}
-
       - name: Bump lib-ml package version
         id: bump
         uses: callowayproject/bump-my-version@master
@@ -62,10 +53,6 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           branch: main
 
-#      - name: Check if current version matches tag version
-#        if: steps.bump.outputs.current-version == ${{ env.version }}
-#        run: |
-#          echo "Same prev and current version."
 
       - name: Check if same versions before and after
         if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
@@ -77,33 +64,9 @@ jobs:
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
-      - name: Force overwrite tag
-        run: |
-          git tag -f v${{ env.version }} -m "Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}"
-
-      - name: Push changes to GitHub
-        uses: ad-m/github-push-action@master
+      - name: Merge staging -> main
+        uses: devmasx/merge-branch@master
         with:
+          type: now
+          target_branch: main
           github_token: ${{ secrets.GH_TOKEN }}
-          branch: main
-          force: true
-
-#      - uses: actions-ecosystem/action-push-tag@v1
-#        with:
-#          tag: v${{ env.version }}
-#          message: 'UPDATED_PACKAGE_VERSION'
-
-
-#      - name: Registry Login (ghcr.io)
-#        run: echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-#
-#      - name: Build, tag, and publish image
-#        run: |
-#          IMG=ghcr.io/${{ github.repository }}
-#          docker build \
-#            -t ${IMG}:latest \
-#            -t ${IMG}:${{ env.version_major }}-latest \
-#            -t ${IMG}:${{ env.version_major }}.${{ env.version_minor }}-latest \
-#            -t ${IMG}:${{ env.version }} \
-#            .
-#          docker push --all-tags $IMG
