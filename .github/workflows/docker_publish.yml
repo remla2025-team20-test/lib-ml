@@ -78,33 +78,38 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           branch: main
 
-      - name: Configure Git user
+#      - name: Configure Git user
+#        run: |
+#          git config user.name "Adrian Josan"
+#          git config user.email "a.josan@tudelft.nl"
+
+      - name: Set git remote
         run: |
-          git config user.name "Adrian Josan"
-          git config user.email "a.josan@tudelft.nl"
+          REMOTE_REPO="https://${GITHUB_ACTOR}:${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          echo "remote_repo=$REMOTE_REPO" >> $GITHUB_ENV
 
       - name: Delete tag version
         run: |
           git tag --delete v${{ env.version }}
-          git push origin --delete v${{ env.version }}
+          git push "${{ env.remote_repo }}" --delete ${GITHUB_REF}
           git tag -l
 
-      - name: Create and push new branch
+      - name: Create and push new release branch
         run: |
           git checkout -b "v${{ env.version }}"
-          git push origin "v${{ env.version }}"
+          git push "${{ env.remote_repo }}" "v${{ env.version }}"
 
       - name: Re-tag version for the new commit
         run: |
           git tag -f v${{ env.version }} -m 'Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}'
-#          git push origin -f v${{ env.version }}
+          git push "${{ env.remote_repo }}" -f v${{ env.version }}
 
-      - name: Push updated tag
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          tags: true
-          force: true
+#      - name: Push updated tag
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.GH_TOKEN }}
+#          tags: true
+#          force: true
 
       - name: Check if same versions before and after
         if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
