@@ -63,19 +63,19 @@ jobs:
 #          delete_release: false #(optional) default: true - also delete all releases and their assets that are associated to the tag name
 #          github_token: ${{ secrets.GH_TOKEN }} # (required) - a GitHub token with write access to the repo where tags and releases will be searched and deleted
 
-      - name: Create Branch
-        uses: peterjgrainger/action-create-branch@v2.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: 'v${{ env.version }}'
+#      - name: Create Branch
+#        uses: peterjgrainger/action-create-branch@v2.2.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          branch: 'v${{ env.version }}'
 
-      - name: Checkout main v${{ env.version }} branch
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: v${{ env.version }}
-          fetch-depth: 0  # Required to fetch full history and tags
+#      - name: Checkout main v${{ env.version }} branch
+#        uses: actions/checkout@v4
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          ref: v${{ env.version }}
+#          fetch-depth: 0  # Required to fetch full history and tags
 
       - name: Bump lib-ml package version
         id: bump
@@ -87,7 +87,7 @@ jobs:
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
-          branch: v${{ env.version }}
+          branch: main
 
       - name: Re-tag version for the new commit
         run: |
@@ -100,6 +100,11 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
           tags: true
           force: true
+
+      - name: Create and push new branch
+        run: |
+          git checkout -b "v${{ env.version }}"
+          git push origin "v${{ env.version }}"
 
       - name: Check if same versions before and after
         if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
