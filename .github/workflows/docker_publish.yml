@@ -34,7 +34,7 @@ jobs:
         id: tagmsg
         run: |
           # Show tag and message, extract the message part, and get the first two words
-          MESSAGE=$(git tag -l -n99 "v${{ env.version }}" | sed -E "s/^v${{ env.version }}\s+//" | awk '{print $1, $2}')  
+          MESSAGE=$(echo "git tag -1 -n99 "v${{ env.version }}" | sed -E "s/^v${{ env.version }}\s+//" | head -n 1 | awk '{print $2, $3}')  
           echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
 
       - name: Cancel if tag message is not a version bump
