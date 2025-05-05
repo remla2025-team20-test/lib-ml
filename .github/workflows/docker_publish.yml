@@ -36,10 +36,6 @@ jobs:
           # Show tag and message, extract the message part, and get the first two words
           MESSAGE=$(git tag -l -n99 "v${{ env.version }}" | sed -E "s/^v${{ env.version }}\s+//" | awk '{print $1, $2}')  
           echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
-  
-          if [[ "$MESSAGE" != "Bump version" ]]; then
-            echo "Tag message starts with 'Bump version'. Skipping workflow."
-          fi
 
       - name: Cancel if tag message is not a version bump
         if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
