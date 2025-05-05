@@ -18,11 +18,6 @@ jobs:
           ref: main
           fetch-depth: 0  # Required to fetch full history and tags
 
-      - name: Configure Git user
-        run: |
-          git config user.name "Adrian Josan"
-          git config user.email "a.josan@tudelft.nl"
-
       - name: Get tag message
         id: tagmsg
         run: |
@@ -82,6 +77,11 @@ jobs:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
           branch: main
+
+      - name: Configure Git user
+        run: |
+          git config user.name "Adrian Josan"
+          git config user.email "a.josan@tudelft.nl"
 
       - name: Delete tag version
         run: |
