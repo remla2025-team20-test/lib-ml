@@ -29,9 +29,10 @@ jobs:
         if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           echo "Tag message starts with 'Bump version'. Skipping workflow."
-          exit 1
+#          exit 1
 
       - name: Parse version info from tag
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
           VERSION=${GITHUB_REF:11}
@@ -45,28 +46,8 @@ jobs:
 
 #    TODO: checkout branch on which the tag was created (not linked to tag, need to search (branch -r ...))
 
-#      - name: Delete tag
-#        uses: dev-drprasad/delete-tag-and-release@v1.1
-#        with:
-#          tag_name: v${{ env.version }} #(required) - The name of the tag to delete. This is expected to be solely the tag name, not the name of a git reference.
-#          delete_release: false #(optional) default: true - also delete all releases and their assets that are associated to the tag name
-#          github_token: ${{ secrets.GH_TOKEN }} # (required) - a GitHub token with write access to the repo where tags and releases will be searched and deleted
-
-#      - name: Create Branch
-#        uses: peterjgrainger/action-create-branch@v2.2.0
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          branch: 'v${{ env.version }}'
-
-#      - name: Checkout main v${{ env.version }} branch
-#        uses: actions/checkout@v4
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          ref: v${{ env.version }}
-#          fetch-depth: 0  # Required to fetch full history and tags
-
       - name: Bump lib-ml package version
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         id: bump
         uses: callowayproject/bump-my-version@master
         env:
@@ -78,45 +59,38 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           branch: main
 
-#      - name: Configure Git user
-#        run: |
-#          git config user.name "Adrian Josan"
-#          git config user.email "a.josan@tudelft.nl"
 
       - name: Set git remote
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           REMOTE_REPO="https://${GITHUB_ACTOR}:${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
           echo "remote_repo=$REMOTE_REPO" >> $GITHUB_ENV
 
       - name: Delete tag version
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           git tag --delete v${{ env.version }}
           git push "${{ env.remote_repo }}" --delete ${GITHUB_REF}
           git tag -l
 
       - name: Create and push new release branch
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           git checkout -b "v${{ env.version }}"
           git push "${{ env.remote_repo }}" "refs/heads/v${{ env.version }}"
 
       - name: Re-tag version for the new commit
+        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           git tag -f v${{ env.version }} -m 'Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}'
           git push "${{ env.remote_repo }}" -f "refs/tags/v${{ env.version }}"
 
-#      - name: Push updated tag
-#        uses: ad-m/github-push-action@master
-#        with:
-#          github_token: ${{ secrets.GH_TOKEN }}
-#          tags: true
-#          force: true
-
       - name: Check if same versions before and after
-        if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version
+        if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version && !startsWith(steps.tagmsg.outputs.message, 'Bump version')
         run: |
           echo "Same prev and current version."
 
       - name: Check if bumped
-        if: steps.bump.outputs.bumped == 'true'
+        if: steps.bump.outputs.bumped == 'true' && !startsWith(steps.tagmsg.outputs.message, 'Bump version')
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
