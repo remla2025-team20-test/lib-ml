@@ -34,7 +34,6 @@ jobs:
         if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           echo "Tag message starts with 'Bump version'. Skipping workflow."
-#          exit 1
 
       - name: Parse version info from tag
         if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
