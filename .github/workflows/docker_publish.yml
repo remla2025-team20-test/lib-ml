@@ -18,25 +18,7 @@ jobs:
           ref: ${{ vars.RELEASE_BRANCH }}
           fetch-depth: 0
 
-      - name: Get tag message
-        id: tagmsg
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          # Show tag and message, extract the message part, and get the first two words
-          MESSAGE=$(git tag -l -n99 "$TAG" | sed -E "s/^$TAG\s+//" | awk '{print $1, $2}')  
-          echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
-  
-          if [[ "$MESSAGE" != "Bump version" ]]; then
-            echo "Tag message starts with 'Bump version'. Skipping workflow."
-          fi
-
-      - name: Cancel if tag message is not a version bump
-        if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
-        run: |
-          echo "Tag message starts with 'Bump version'. Skipping workflow."
-
       - name: Parse version info from tag
-        if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
           VERSION=${GITHUB_REF:11}
@@ -47,6 +29,22 @@ jobs:
           echo "version_major=$MAJOR" >> $GITHUB_ENV
           echo "version_minor=$MINOR" >> $GITHUB_ENV
           echo "version_patch=$PATCH" >> $GITHUB_ENV
+
+      - name: Get tag message
+        id: tagmsg
+        run: |
+          # Show tag and message, extract the message part, and get the first two words
+          MESSAGE=$(git tag -l -n99 "v${{ env.version }}" | sed -E "s/^v${{ env.version }}\s+//" | awk '{print $1, $2}')  
+          echo "message=$MESSAGE" >> "$GITHUB_OUTPUT"
+  
+          if [[ "$MESSAGE" != "Bump version" ]]; then
+            echo "Tag message starts with 'Bump version'. Skipping workflow."
+          fi
+
+      - name: Cancel if tag message is not a version bump
+        if: ${{ startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
+        run: |
+          echo "Tag message starts with 'Bump version'. Skipping workflow."
 
 #    TODO: checkout branch on which the tag was created (not linked to tag, need to search (branch -r ...))
 
