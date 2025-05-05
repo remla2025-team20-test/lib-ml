@@ -90,3 +90,4 @@ jobs:
         if: steps.bump.outputs.bumped == 'true' && !startsWith(steps.tagmsg.outputs.message, 'Bump version')
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+
