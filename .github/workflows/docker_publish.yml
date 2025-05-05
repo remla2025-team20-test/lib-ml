@@ -4,6 +4,9 @@ on:
   push:
     tags: ["v[0-9]+.[0-9]+.[0-9]+"]
 
+env:
+  RELEASE_BRANCH: "test-release-branch"
+
 permissions:
   contents: write  # Allows deleting tags
 
@@ -15,8 +18,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ref: main
-          fetch-depth: 0  # Required to fetch full history and tags
+          ref: $RELEASE_BRANCH
+          fetch-depth: 0
 
       - name: Get tag message
         id: tagmsg
@@ -52,15 +55,12 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_COMMIT: "true"
-#          BUMPVERSION_TAG: "true"
-#          BUMPVERSION_TAG_NAME: "v${{ env.version }}-release"
         with:
           args: --new-version ${{ env.version }} -v
           github-token: ${{ secrets.GH_TOKEN }}
-          branch: main
+          branch: $RELEASE_BRANCH
 
-
-      - name: Set git remote
+      - name: Set git remote env variable
         if: ${{ !startsWith(steps.tagmsg.outputs.message, 'Bump version') }}
         run: |
           REMOTE_REPO="https://${GITHUB_ACTOR}:${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
@@ -84,11 +84,6 @@ jobs:
         run: |
           git tag -f v${{ env.version }} -m 'Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}'
           git push "${{ env.remote_repo }}" -f "refs/tags/v${{ env.version }}"
-
-      - name: Check if same versions before and after
-        if: steps.bump.outputs.previous-version == steps.bump.outputs.current-version && !startsWith(steps.tagmsg.outputs.message, 'Bump version')
-        run: |
-          echo "Same prev and current version."
 
       - name: Check if bumped
         if: steps.bump.outputs.bumped == 'true' && !startsWith(steps.tagmsg.outputs.message, 'Bump version')
