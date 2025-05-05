@@ -97,12 +97,12 @@ jobs:
       - name: Create and push new release branch
         run: |
           git checkout -b "v${{ env.version }}"
-          git push "${{ env.remote_repo }}" "v${{ env.version }}"
+          git push "${{ env.remote_repo }}" "refs/heads/v${{ env.version }}"
 
       - name: Re-tag version for the new commit
         run: |
           git tag -f v${{ env.version }} -m 'Bump version: from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}'
-          git push "${{ env.remote_repo }}" -f v${{ env.version }}
+          git push "${{ env.remote_repo }}" -f "refs/tags/v${{ env.version }}"
 
 #      - name: Push updated tag
 #        uses: ad-m/github-push-action@master
